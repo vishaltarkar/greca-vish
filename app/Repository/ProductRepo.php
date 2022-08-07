@@ -10,4 +10,15 @@ class ProductRepo
     {
         return Product::latest()->paginate($per_page);
     }
+
+    public function getById($id)
+    {
+        return Product::find($id);
+    }
+
+    public function isAvailable($id)
+    {
+        $product = $this->getById($id);
+        return $product->isAvailable;
+    }
 }

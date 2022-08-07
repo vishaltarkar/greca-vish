@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BookingCollection;
 use App\Models\Booking;
 use App\Repository\BookingRepo;
+use App\Repository\ProductRepo;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,11 +13,12 @@ use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
-    private $booking;
+    private $booking, $product;
 
     public function __construct()
     {
         $this->booking = new BookingRepo();
+        $this->product = new ProductRepo();
     }
 
     /**
@@ -29,6 +31,11 @@ class BookingController extends Controller
     {
         DB::beginTransaction();
         try {
+            // check if product available
+            if ($this->product->isAvailable($request->product_id) == false) {
+                return response()->json(['message' => 'Product not available'], 400);
+            }
+
             # create booking
             $booking = $this->booking->store($request->all());
 
